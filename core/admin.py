@@ -1,3 +1,4 @@
 from django.contrib import admin
-
-# Register your models here.
+from .models import ChatHistory, Message
+admin.site.register(ChatHistory)
+admin.site.register(Message)
