@@ -8,7 +8,7 @@ def dynamic_media_path(instance, filename):
     return f'media/chat_history/{chat_history_slug}/{filename}'
 
 class ChatHistory(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid4)
+    name = models.CharField(max_length=255,primary_key=True)
     users = models.ManyToManyField(User)
      
     def get_users(self):
@@ -30,5 +30,5 @@ class Message(models.Model):
 
 
     def __str__(self):
-        return f'{self.user.username}: {self.content} [{self.timestamp}]'
+        return f'{self.user.username}: {self.message} [{self.sent_timestamp}]'
     
