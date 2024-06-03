@@ -14,8 +14,20 @@ class ChatConsumer(WebsocketConsumer):
     
   def websocket_connect(self,event):
     print('Websocket Connected...',event)
-    self.scope
-    self.accept()
+    print(self.channel_name)
+    self.user = self.scope['user']
+    if self.user.is_authenticated:
+      user_groups = ChatHistory.objects.filter(users=self.user)
+      if user_groups is not None:
+       for group in user_groups:
+        self.room_group_name = group.name
+        async_to_sync(self.channel_layer.group_add)(
+        self.room_group_name,
+        self.channel_name
+      )
+      self.accept()
+    else:
+      self.close()
 
   def websocket_disconnect(self, close_code):
     print('Websocket Disconnected...')
@@ -25,6 +37,7 @@ class ChatConsumer(WebsocketConsumer):
     )
 
   def receive(self, text_data=None, bytes_data=None):
+    print('Message received from client')
     text_data_json = json.loads(text_data)
     message = text_data_json['message']
     sender_user_id = text_data_json['user_id']
@@ -32,38 +45,30 @@ class ChatConsumer(WebsocketConsumer):
     user = User.objects.get(id=sender_user_id)
     receiver = User.objects.get(id=receiver_user_id)
 
-    # Create chat_history if its their first time chati"6a5b53b8-2605-4297-85b8-701e5452fee6"ng
-    chat_history = ChatHistory.objects.filter(name=f"{sender_user_id}:{receiver_user_id}")
-
-    if chat_history is None:
-      chat_history = ChatHistory.objects.create(name=f"{sender_user_id}:{receiver_user_id}")
-      chat_history.users = user
-      chat_history.users = receiver
-      chat_history = chat_history.save()
-      chat_history = ChatHistory.objects.filter(name=f"{sender_user_id}:{receiver_user_id}")
+    # Create chat_history if it's their first time chatting
+    chat_history_name = f"{sender_user_id}_{receiver_user_id}"
+    chat_history, created = ChatHistory.objects.get_or_create(name=chat_history_name)
+    if created:
+      self.room_group_name = str(chat_history.name)
+      chat_history.users.add(user, receiver)
+      chat_history.save()
+      # Add channel to the group
+      print(self.room_group_name)
+      print(type(self.room_group_name))
       async_to_sync(self.channel_layer.group_add)(
-        str(chat_history.name),
+        self.room_group_name,
         self.channel_name
       )
-
-
-    message_instance = Message.objects.create(
-      user=user,
-      chat_history = ChatHistory.objects.filter(name=f"{sender_user_id}:{receiver_user_id}"),
-      message=message
-    )
-
+    else:
+      self.room_group_name = str(chat_history.name)
+      
     message_data = {
-      'id': message_instance.id,
       'user': user.username,
-      'message': message_instance.message,
-      'sent_timestamp': message_instance.sent_timestamp.isoformat()
+      'message': message,
     }
 
-    # Adds sender and receiver/receivers to same group
-    
-
     # send chat message event to the room
+    print("Chat message....",message_data)
     async_to_sync(self.channel_layer.group_send)(
       self.room_group_name,
       {
@@ -71,6 +76,12 @@ class ChatConsumer(WebsocketConsumer):
         'message': message_data,
       }
     )
+    message_instance = Message.objects.create(
+      user=user,
+      chat_history = chat_history,
+      message=message
+    )
 
   def chat_message(self, event):
+    print("Chat message....")
     self.send(text_data=json.dumps(event))
