@@ -1,7 +1,7 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
-from django.contrib.auth.models import User
+from ..auth.models import CustomUser
 from .models import ChatHistory, Message
 
 
@@ -91,7 +91,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def get_user(self, user_id):
-        return User.objects.get(id=user_id)
+        return CustomUser.objects.get(id=user_id)
 
     @database_sync_to_async
     def get_or_create_chat_history(self, name):
