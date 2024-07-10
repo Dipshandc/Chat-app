@@ -4,7 +4,7 @@ from rest_framework.authentication import get_authorization_header
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import AnonymousUser
 
-class BearerTokenMiddleware(MiddlewareMixin):
+class TokenMiddleware(MiddlewareMixin):
     def process_request(self, request):
         auth_header = get_authorization_header(request).split()
 
