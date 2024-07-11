@@ -15,3 +15,7 @@ class CustomUser(AbstractUser):
   def __str__(self):
     return self.username
   
+class UserStatus(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    status = models.CharField(max_length=10, choices=[('online', 'Online'), ('offline', 'Offline')])
+    last_seen = models.DateTimeField()
