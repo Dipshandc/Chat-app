@@ -14,7 +14,7 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.security.websocket import AllowedHostsOriginValidator
 from django.core.asgi import get_asgi_application
 from core.routing import websocket_urlpatterns
-from auth.middleware import TokenMiddleware
+from authentication.middleware import TokenMiddleware
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'chat.settings')
 

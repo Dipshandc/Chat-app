@@ -4,7 +4,7 @@ from datetime import datetime
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 
-from ..auth.models import CustomUser, UserStatus
+from ..authentication.models import CustomUser, UserStatus
 from .models import ChatHistory, Message
 
 
@@ -98,6 +98,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
             message_id = text_data_json['message_id']
             sender_user_id = text_data_json['user_id']
             receiver_user_id = text_data_json['receiver_id']
+            updated_message_info_type = text_data_json['updated_message_info_type']
+            if updated_message_info_type == 'seen':
+                await self.update_message_seen_status(message_id, sender_user_id, receiver_user_id)
+            else:
+                await self.update_message_delivered_status(message_id, sender_user_id, receiver_user_id)
 
 
     async def chat_message(self, event):
@@ -132,5 +137,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
     @database_sync_to_async
-    def update_message_info(self, message_id):
-        message = 
+    def update_message_seen_status(self, message_id):
+        message =  Message.objects.get(id=message_id)
+        message.seen_timestamp = datetime.now()
+        message.save()
+
+    @database_sync_to_async
+    def update_message_delivered_status(self, message_id):
+        message =  Message.objects.get(id=message_id)
+        message.deliverd_timestamp = datetime.now()
+        message.save()
