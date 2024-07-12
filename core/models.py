@@ -1,4 +1,4 @@
-from ..auth.models import CustomUser
+from authentication.models import CustomUser
 from django.utils.text import slugify
 from django.db import models
 from uuid import uuid4
