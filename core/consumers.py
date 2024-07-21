@@ -4,7 +4,7 @@ from datetime import datetime
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 
-from ..authentication.models import CustomUser, UserStatus
+from authentication.models import CustomUser, UserStatus
 from .models import ChatHistory, Message
 
 
