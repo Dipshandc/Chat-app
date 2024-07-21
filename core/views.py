@@ -9,6 +9,7 @@ class MessagePagination(PageNumberPagination):
     page_size = 20
 
 class ChatHistoryView(APIView):
+    serializer_class = MessageSerializer
     def get(self, request, pk):
         try:
             chat_history = ChatHistory.objects.get(pk=pk)

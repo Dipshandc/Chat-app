@@ -23,7 +23,14 @@ django_asgi_app = get_asgi_application()
 application = ProtocolTypeRouter(
     {
         "http": django_asgi_app,
-        "websocket": TokenMiddleware(AuthMiddlewareStack(URLRouter(websocket_urlpatterns),))
-        
+        "websocket": AllowedHostsOriginValidator(
+            TokenMiddleware(
+                AuthMiddlewareStack(
+                    URLRouter(
+                        websocket_urlpatterns
+                    )
+                )
+            )
+        )
     }
 )
