@@ -29,19 +29,14 @@ class UserViewSet(APIView):
         },
     )
     def post(self, request, *args, **kwargs):
-        try:
             serializer = self.serializer_class(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            self.perform_create(serializer)
-            headers = self.get_success_headers(serializer.data)
-            return Response({"message": "User created successfully."}, status=status.HTTP_201_CREATED, headers=headers)
-        
-        except ValidationError as e:
-            return Response({"errors": e.detail}, status=status.HTTP_400_BAD_REQUEST)
-        
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+            if serializer.is_valid(raise_exception=True):
+                self.perform_create(serializer)
+                headers = self.get_success_headers(serializer.data)
+                return Response({"message": "User created successfully."}, status=status.HTTP_201_CREATED, headers=headers)
+            else:
+                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                
     def perform_create(self, serializer):
         serializer.save()
 
