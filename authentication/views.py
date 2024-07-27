@@ -1,3 +1,4 @@
+from django.forms import ValidationError
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -28,11 +29,18 @@ class UserViewSet(APIView):
         },
     )
     def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response({"message": "User created successfully."}, status=status.HTTP_201_CREATED, headers=headers)
+        try:
+            serializer = self.serializer_class(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response({"message": "User created successfully."}, status=status.HTTP_201_CREATED, headers=headers)
+        
+        except ValidationError as e:
+            return Response({"errors": e.detail}, status=status.HTTP_400_BAD_REQUEST)
+        
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def perform_create(self, serializer):
         serializer.save()
