@@ -23,5 +23,5 @@ class UserProfile(models.Model):
    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
    bio = models.TextField(null=True,blank=True)
    profile_pic = models.ImageField(upload_to='media/profile_pics',null=True,blank=True)
-   date = models.DateField(blank=True,null=True)
+   date_of_birth= models.DateField(blank=True,null=True)
   
