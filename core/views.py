@@ -18,7 +18,7 @@ class ChatHistoryView(APIView):
 
     @extend_schema(
         summary="Retrieve chat history messages",
-        description="Endpoint to retrieve messages from a specific chat history by its ID. The response is paginated.",
+        description="Endpoint to retrieve messages from a specific chat history by its name. The response is paginated.",
         request=None,
         responses={
             200: OpenApiResponse(
@@ -144,8 +144,8 @@ class UserListView(APIView):
         """
         search_term = request.query_params.get('search', None)
         if search_term:
-            users = CustomUser.objects.filter(username__icontains=search_term)
+            users = CustomUser.objects.filter(username__icontains=search_term).exclude(is_superuser=True)
         else:
-            users = CustomUser.objects.all()
+            users = CustomUser.objects.exclude(is_superuser=True)
         serializer = self.serializer_class(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
