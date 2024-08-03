@@ -142,10 +142,11 @@ class UserListView(APIView):
         This endpoint allows authenticated users to retrieve a list of users.
         The list can be filtered by username using the `search` query parameter.
         """
+        current_user = request.user
         search_term = request.query_params.get('search', None)
         if search_term:
-            users = CustomUser.objects.filter(username__icontains=search_term).exclude(is_superuser=True)
+            users = CustomUser.objects.filter(username__icontains=search_term, is_superuser=False).exclude(username=current_user.username)
         else:
-            users = CustomUser.objects.exclude(is_superuser=True)
+            users = CustomUser.objects.filter(is_superuser=False).exclude(username=current_user.username)
         serializer = self.serializer_class(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
