@@ -51,11 +51,14 @@ class ChatHistoryView(APIView):
             ),
             404: OpenApiResponse(
                 description="Chat history not found",
-                response=OpenApiExample(
-                    'Chat History Not Found',
-                    value={"detail": "Chat history not found."},
-                    response_only=True
-                )
+                response=OpenApiTypes.OBJECT,
+                examples=[
+                    OpenApiExample(
+                        'Chat History Not Found',
+                        value={"detail": "Chat history not found."},
+                        response_only=True
+                    )
+                ]
             )
         },
         tags=['Chat History']
@@ -77,7 +80,6 @@ class ChatHistoryView(APIView):
 
         # Check if user has permission to access this ChatHistory
         self.check_object_permissions(request, chat_history)
-
 
         messages = Message.objects.filter(chat_history=chat_history).order_by('sent_timestamp')
         paginator = MessagePagination()
@@ -111,26 +113,24 @@ class UserListView(APIView):
                                 "id": 1,
                                 "username": "johndoe",
                                 "email": "johndoe@example.com",
-                                "profile": [
-                                    {
-                                        "profile_pic": "http://example.com/profile_pic.jpg",
-                                        "bio": "Software Developer"
-                                    }
-                                ]
                             },
                             {
                                 "id": 2,
                                 "username": "janedoe",
                                 "email": "janedoe@example.com",
-                                "profile": [
-                                    {
-                                        "profile_pic": "http://example.com/profile_pic2.jpg",
-                                        "bio": "Graphic Designer"
-                                    }
-                                ]
                             }
                         ],
                         media_type='application/json'
+                    )
+                ]
+            ),
+            404: OpenApiResponse(
+                description="Users not found",
+                examples=[
+                    OpenApiExample(
+                        'Users Not Found',
+                        value={"detail": "Users not found."},
+                        response_only=True
                     )
                 ]
             )
@@ -148,8 +148,19 @@ class UserListView(APIView):
         search_term = request.query_params.get('search', None)
         if search_term:
             users = CustomUser.objects.filter(username__icontains=search_term, is_superuser=False).exclude(username=current_user.username)
+            if not users.exists():
+                return Response(
+                    {"detail": "Users not found."},
+                    status=status.HTTP_404_NOT_FOUND
+                )
         else:
             users = CustomUser.objects.filter(is_superuser=False).exclude(username=current_user.username)
+            if not users.exists():
+                return Response(
+                    {"detail": "Users not found."},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
         serializer = self.serializer_class(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -179,11 +190,14 @@ class UserDetailsView(APIView):
             ),
             404: OpenApiResponse(
                 description="User not found",
-                response=OpenApiExample(
-                    'User Not Found',
-                    value={"detail": "User not found."},
-                    response_only=True
-                )
+                response=OpenApiTypes.OBJECT,
+                examples=[
+                    OpenApiExample(
+                        'User Not Found',
+                        value={"detail": "User not found."},
+                        response_only=True
+                    )
+                ]
             )
         },
         tags=['Users']
