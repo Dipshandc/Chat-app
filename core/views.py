@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiResponse, OpenApiExample, OpenApiTypes
 from authentication.models import CustomUser
+from django.shortcuts import get_object_or_404
 from .models import ChatHistory, Message
 from .serializers import MessageSerializer, UserSerializer
 from .permissions import ChatHistoryOfUser
@@ -76,6 +77,7 @@ class ChatHistoryView(APIView):
 
         # Check if user has permission to access this ChatHistory
         self.check_object_permissions(request, chat_history)
+
 
         messages = Message.objects.filter(chat_history=chat_history).order_by('sent_timestamp')
         paginator = MessagePagination()
@@ -149,4 +151,49 @@ class UserListView(APIView):
         else:
             users = CustomUser.objects.filter(is_superuser=False).exclude(username=current_user.username)
         serializer = self.serializer_class(users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class UserDetailsView(APIView):
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        summary="Retrieve user details",
+        description="Endpoint to retrieve details of a specific user by their ID.",
+        request=None,
+        responses={
+            200: OpenApiResponse(
+                description="User details",
+                response=UserSerializer,
+                examples=[
+                    OpenApiExample(
+                        'Example Response',
+                        value={
+                            "id": 1,
+                            "username": "johndoe",
+                            "email": "johndoe@example.com",
+                        },
+                        media_type='application/json'
+                    )
+                ]
+            ),
+            404: OpenApiResponse(
+                description="User not found",
+                response=OpenApiExample(
+                    'User Not Found',
+                    value={"detail": "User not found."},
+                    response_only=True
+                )
+            )
+        },
+        tags=['Users']
+    )
+    def get(self, request, id):
+        """
+        Retrieve user details by ID.
+
+        This endpoint allows authenticated users to retrieve details of a specific user by their ID.
+        """
+        user = get_object_or_404(CustomUser, id=id)
+        serializer = UserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)

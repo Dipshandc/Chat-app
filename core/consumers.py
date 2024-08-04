@@ -19,8 +19,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
         print('Websocket Connected...')
         self.user = self.scope['user']
         if self.user.is_authenticated:
-            self.connection_count += 1
-            self.update_user_status(self.user.id, 'online')
+            if await self.update_user_status(self.user.id, 'online'):
+                self.connection_count += 1
+                print(self.connection_count)
+                print('success updating user status')
+            else:
+                print('Error updating user status')
             await self.channel_layer.group_add(
                 f'{self.user.username}_inbox',
                 self.channel_name
@@ -30,10 +34,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.close()
 
     async def disconnect(self, close_code):
-        print('Websocket Disconnected...')
+        print(f'Websocket Disconnected with code: {close_code}')
         self.connection_count -= 1
+        print(self.connection_count)
         if self.connection_count == 0:
-            self.update_user_status(self.user.id, 'offline')
+            await self.update_user_status(self.user.id, 'offline')
         await self.channel_layer.group_discard(
             f'{self.user.username}_inbox',
             self.channel_name,
@@ -42,11 +47,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data=None, bytes_data=None):
         print('Message received from client')
         text_data_json = json.loads(text_data)
+        print(text_data_json)
         received_data_type = text_data_json['type']
 
         if received_data_type == 'message':
             message = text_data_json['message']
-            sender_user_id = text_data_json['user_id']
+            sender_user_id = self.user.id
             receiver_user_id = text_data_json['receiver_id']
             group_id = text_data_json['group_id']
 
@@ -135,6 +141,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         UserStatus.objects.update_or_create(
             user_id=user_id, defaults={"status": status, "last_seen": datetime.now()}
         )
+        return True
 
     @database_sync_to_async
     def update_message_seen_status(self, message_id):
