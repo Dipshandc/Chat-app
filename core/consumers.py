@@ -65,6 +65,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     'user': user.username,
                     'message': message,
                 }
+                print(message_data)
+
 
                 await self.channel_layer.group_send(
                     f'{receiver.username}_inbox',
@@ -75,7 +77,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 )
 
                 # Create chat_history if it's their first time chatting
-                chat_history_name = f"{sender_user_id}_{receiver_user_id}"
+                chat_history_name = f"{min(sender_user_id,receiver_user_id)}_{max(sender_user_id,receiver_user_id)}"
                 chat_history, created = await self.get_or_create_chat_history(chat_history_name)
                 if created:
                     await self.add_users_to_chat_history(chat_history, user, receiver)
