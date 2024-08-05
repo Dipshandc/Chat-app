@@ -77,6 +77,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 )
 
                 # Create chat_history if it's their first time chatting
+                print('senderid',sender_user_id)
+                print('senderid',receiver_user_id)
+
                 chat_history_name = f"{min(sender_user_id,receiver_user_id)}_{max(sender_user_id,receiver_user_id)}"
                 chat_history, created = await self.get_or_create_chat_history(chat_history_name)
                 if created:
