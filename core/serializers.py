@@ -10,7 +10,8 @@ class ChatHistorySerializer(ModelSerializer):
 class MessageSerializer(ModelSerializer):
   class Meta:
     model = Message
-    fields = ['user',
+    fields = ['id',
+              'user',
               'chat_history',
               'message',
               'media',

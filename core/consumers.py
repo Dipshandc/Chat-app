@@ -6,6 +6,7 @@ from channels.db import database_sync_to_async
 
 from authentication.models import CustomUser, UserStatus
 from .models import ChatHistory, Message
+from .serializers import MessageSerializer
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -60,12 +61,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
             receiver = await self.get_user(receiver_user_id)
 
             # For Personal message
+
             if not group_id:
-                message_data = {
-                    'user': user.username,
-                    'message': message,
-                }
-                print(message_data)
+                # Create chat_history if it's their first time chatting
+                chat_history_name = f"{min(sender_user_id,receiver_user_id)}_{max(sender_user_id,receiver_user_id)}"
+                chat_history, created = await self.get_or_create_chat_history(chat_history_name)
+                if created:
+                    await self.add_users_to_chat_history(chat_history, user, receiver)
+                message_obj =  await self.create_message(user, chat_history, message)
+                serialize_message = await self.serialize_message(message_obj)
+                message_data = serialize_message.data
 
 
                 await self.channel_layer.group_send(
@@ -75,18 +80,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         'message': message_data,
                     }
                 )
-
-                # Create chat_history if it's their first time chatting
-                print('senderid',sender_user_id)
-                print('senderid',receiver_user_id)
-
-                chat_history_name = f"{min(sender_user_id,receiver_user_id)}_{max(sender_user_id,receiver_user_id)}"
-                chat_history, created = await self.get_or_create_chat_history(chat_history_name)
-                if created:
-                    await self.add_users_to_chat_history(chat_history, user, receiver)
-
-                await self.create_message(user, chat_history, message)
-
             # For Group message
             else:
                 chat_history = await self.get_chat_history(group_id)
@@ -105,6 +98,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                             }
                         )
                         await self.create_message(user, chat_history, message)
+                        
         elif received_data_type == 'updated_message_info':
             message_id = text_data_json['message_id']
             sender_user_id = text_data_json['user_id']
@@ -136,6 +130,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def create_message(self, user, chat_history, message):
         return Message.objects.create(user=user, chat_history=chat_history, message=message)
+    
+    @database_sync_to_async
+    def serialize_message(self,message_obj):
+        return MessageSerializer(message_obj)
 
     @database_sync_to_async
     def get_chat_history(self, group_id):
