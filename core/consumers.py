@@ -80,6 +80,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         'message': message_data,
                     }
                 )
+                await self.channel_layer.group_send(
+                    f'{user.username}_inbox',
+                    {
+                        'type': 'chat_message',
+                        'message': message_data,
+                    }
+                )
             # For Group message
             else:
                 chat_history = await self.get_chat_history(group_id)
