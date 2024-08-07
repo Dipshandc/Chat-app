@@ -29,5 +29,5 @@ class UserProfile(models.Model):
     date_of_birth= models.DateField(blank=True,null=True)
   
     def __str__(self):
-      return f"{self.user.username}'s Status"
+      return f"{self.user.username}'s Profile"
   

@@ -224,6 +224,7 @@ class UserProfileView(APIView):
      
      def patch(self,request):
           profile = get_object_or_404(UserProfile,user=request.user)
+          print(request.data)
           serializer = self.serializer_class(profile,data=request.data,partial=True)
           if serializer.is_valid(raise_exception=True):
            serializer.save()
