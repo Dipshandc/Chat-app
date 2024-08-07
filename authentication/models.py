@@ -19,9 +19,15 @@ class UserStatus(models.Model):
     status = models.CharField(max_length=10, choices=[('online', 'Online'), ('offline', 'Offline')])
     last_seen = models.DateTimeField()
 
+    def __str__(self):
+      return f"{self.user.username}'s Status"
+
 class UserProfile(models.Model):
-   user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-   bio = models.TextField(null=True,blank=True)
-   profile_pic = models.ImageField(upload_to='media/profile_pics',null=True,blank=True)
-   date_of_birth= models.DateField(blank=True,null=True)
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    bio = models.TextField(null=True,blank=True)
+    profile_pic = models.ImageField(upload_to='profile_pics',null=True,blank=True)
+    date_of_birth= models.DateField(blank=True,null=True)
+  
+    def __str__(self):
+      return f"{self.user.username}'s Status"
   

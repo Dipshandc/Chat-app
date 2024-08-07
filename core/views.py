@@ -4,10 +4,10 @@ from rest_framework import filters, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiResponse, OpenApiExample, OpenApiTypes
-from authentication.models import CustomUser
+from authentication.models import CustomUser, UserProfile
 from django.shortcuts import get_object_or_404
 from .models import ChatHistory, Message
-from .serializers import MessageSerializer, UserSerializer
+from .serializers import MessageSerializer, UserSerializer, UserProfileSerializer
 from .permissions import ChatHistoryOfUser
 
 class MessagePagination(PageNumberPagination):
@@ -15,7 +15,7 @@ class MessagePagination(PageNumberPagination):
 
 class ChatHistoryView(APIView):
     serializer_class = MessageSerializer
-    permission_classes = [IsAuthenticated, ChatHistoryOfUser]
+    permission_classes = []
 
     @extend_schema(
         summary="Retrieve chat history messages",
@@ -147,14 +147,14 @@ class UserListView(APIView):
         current_user = request.user
         search_term = request.query_params.get('search', None)
         if search_term:
-            users = CustomUser.objects.filter(username__icontains=search_term, is_superuser=False).exclude(username=current_user.username)
+            users = CustomUser.objects.select_related('userprofile', 'userstatus').filter(username__icontains=search_term, is_superuser=False).exclude(username=current_user.username)
             if not users.exists():
                 return Response(
                     {"detail": "Users not found."},
                     status=status.HTTP_404_NOT_FOUND
                 )
         else:
-            users = CustomUser.objects.filter(is_superuser=False).exclude(username=current_user.username)
+            users = CustomUser.objects.select_related('userprofile', 'userstatus').filter(is_superuser=False).exclude(username=current_user.username)
             if not users.exists():
                 return Response(
                     {"detail": "Users not found."},
@@ -211,3 +211,20 @@ class UserDetailsView(APIView):
         user = get_object_or_404(CustomUser, id=id)
         serializer = UserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class UserProfileView(APIView):
+     serializer_class = UserProfileSerializer
+     permission_classes = []
+     
+     def get(self,request):
+          profile = get_object_or_404(UserProfile,user=request.user)
+          serializer = self.serializer_class(profile)
+          return Response(serializer.data,status=status.HTTP_200_OK)
+     
+     def patch(self,request):
+          profile = get_object_or_404(UserProfile,user=request.user)
+          serializer = self.serializer_class(profile,data=request.data,partial=True)
+          if serializer.is_valid(raise_exception=True):
+           serializer.save()
+           return Response({"message": f"Profile's {', '.join(request.data.keys())} edited successfully"})

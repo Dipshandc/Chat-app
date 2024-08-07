@@ -1,6 +1,6 @@
 from rest_framework.serializers import ModelSerializer
 from .models import ChatHistory, Message
-from authentication.models import CustomUser, UserProfile
+from authentication.models import CustomUser, UserProfile, UserStatus
 
 class ChatHistorySerializer(ModelSerializer):
   class Meta:
@@ -25,8 +25,19 @@ class UserProfileSerializer(ModelSerializer):
         model = UserProfile
         fields = ['profile_pic', 'bio']
 
+class UserStatusSerializer(ModelSerializer):
+    class Meta:
+        model = UserStatus
+        fields = ['status', 'last_seen']
+
 class UserSerializer(ModelSerializer):
-    profile = UserProfileSerializer(many=True, read_only=True)
+    profile = UserProfileSerializer(read_only=True)
+    user_status = UserStatusSerializer(read_only=True)
     class Meta:
         model = CustomUser
-        fields = ['id','username', 'email','profile']
+        fields = ['id','username', 'email','profile','user_status']
+
+class UserProfileSerializer(ModelSerializer):
+  class Meta:
+    model = UserProfile
+    fields = ['user','bio','profile_pic']
