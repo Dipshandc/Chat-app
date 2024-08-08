@@ -11,7 +11,7 @@ from .serializers import MessageSerializer, UserSerializer, UserProfileSerialize
 from .permissions import ChatHistoryOfUser
 
 class MessagePagination(PageNumberPagination):
-    page_size = 20
+    page_size = 2
 
 class ChatHistoryView(APIView):
     serializer_class = MessageSerializer
@@ -81,7 +81,7 @@ class ChatHistoryView(APIView):
         # Check if user has permission to access this ChatHistory
         self.check_object_permissions(request, chat_history)
 
-        messages = Message.objects.filter(chat_history=chat_history).order_by('sent_timestamp')
+        messages = Message.objects.filter(chat_history=chat_history).order_by('-sent_timestamp')
         paginator = MessagePagination()
         paginated_messages = paginator.paginate_queryset(messages, request)
 
