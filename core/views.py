@@ -15,7 +15,7 @@ class MessagePagination(PageNumberPagination):
 
 class ChatHistoryView(APIView):
     serializer_class = MessageSerializer
-    permission_classes = []
+    permission_classes = [IsAuthenticated,ChatHistoryOfUser]
 
     @extend_schema(
         summary="Retrieve chat history messages",
@@ -70,17 +70,8 @@ class ChatHistoryView(APIView):
         The endpoint allows authenticated users with appropriate permissions to
         retrieve a paginated list of messages for a specific chat history.
         """
-        try:
-            chat_history = ChatHistory.objects.get(name=name)
-        except ChatHistory.DoesNotExist:
-            return Response(
-                {"detail": "Chat history not found."},
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-        # Check if user has permission to access this ChatHistory
-        self.check_object_permissions(request, chat_history)
-
+    
+        chat_history =get_object_or_404(ChatHistory,name=name)
         messages = Message.objects.filter(chat_history=chat_history).order_by('-sent_timestamp')
         paginator = MessagePagination()
         paginated_messages = paginator.paginate_queryset(messages, request)
@@ -215,7 +206,7 @@ class UserDetailsView(APIView):
 
 class UserProfileView(APIView):
      serializer_class = UserProfileSerializer
-     permission_classes = []
+     permission_classes = [IsAuthenticated]
      
      def get(self,request):
           profile = get_object_or_404(UserProfile,user=request.user)
