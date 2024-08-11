@@ -9,3 +9,12 @@ ALLOWED_HOSTS = ['chat-app-xcsf.onrender.com']
 DATABASES = {
   "default":dj_database_url.config()
 }
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [env("REDIS_URL")]
+        },
+    },
+}
