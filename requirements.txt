@@ -8,12 +8,14 @@ channels-redis==4.2.0
 constantly==23.10.4
 cryptography==42.0.7
 daphne==4.1.2
+dj-database-url==2.2.0
 Django==5.0.6
 django-cors-headers==4.4.0
 djangorestframework==3.15.1
 djangorestframework-simplejwt==5.3.1
 drf-spectacular==0.27.2
 environs==11.0.0
+gunicorn==23.0.0
 hyperlink==21.0.0
 idna==3.7
 incremental==22.10.0
