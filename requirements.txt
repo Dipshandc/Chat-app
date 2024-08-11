@@ -31,6 +31,7 @@ pillow==10.4.0
 pyasn1==0.6.0
 pyasn1_modules==0.4.0
 pycparser==2.22
+psycopg2-binary==2.9.6
 PyJWT==2.8.0
 pyOpenSSL==24.1.0
 python-dotenv==1.0.1
