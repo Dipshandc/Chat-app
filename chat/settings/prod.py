@@ -4,7 +4,7 @@ DEBUG = False
 
 SECRET_KEY = env('SECRET_KEY')
 
-ALLOWED_HOSTS = ['chat-app-xcsf.onrender.com']
+ALLOWED_HOSTS =  env('ALLOWED_HOSTS', '').split(',')
 
 DATABASES = {
   "default":dj_database_url.config()
