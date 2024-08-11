@@ -10,7 +10,8 @@ https://docs.djangoproject.com/en/4.2/howto/deployment/wsgi/
 import os
 
 from django.core.wsgi import get_wsgi_application
+from chat.settings.common import env
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'chat.settings.dev')
+env('DJANGO_SETTINGS_MODULE', 'chat.settings.dev')
 
 application = get_wsgi_application()
