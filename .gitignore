@@ -131,7 +131,6 @@ env.bak/
 venv.bak/
 
 staticfiles
-media
 
 # Spyder project settings
 .spyderproject
