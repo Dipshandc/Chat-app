@@ -81,7 +81,7 @@ class ChatHistoryView(APIView):
 
 class UserListView(APIView):
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = []
     filter_backends = (filters.SearchFilter,)
     search_fields = ['username']
 
@@ -101,15 +101,25 @@ class UserListView(APIView):
                         'Example Response',
                         value=[
                             {
-                                "id": 1,
-                                "username": "johndoe",
-                                "email": "johndoe@example.com",
+                            "id": "6cc5f",
+                            "username": "username",
+                            "email": "useremail@gmail.com",
+                            "profile": {
+                            "profile_pic": "/media/profile_pics/house.jpeg",
+                            "bio": "user bio"
                             },
-                            {
-                                "id": 2,
-                                "username": "janedoe",
-                                "email": "janedoe@example.com",
+                            "user_status": {
+                            "status": "offline",
+                            "last_seen": "2024-08-07T07:38:27.717376Z"
                             }
+                            },
+                                                        {
+                            "id": "6cc5f",
+                            "username": "username",
+                            "email": "useremail@gmail.com",
+                            "profile":"null",
+                            "user_status":"null",
+                            },
                         ],
                         media_type='application/json'
                     )
@@ -117,6 +127,7 @@ class UserListView(APIView):
             ),
             404: OpenApiResponse(
                 description="Users not found",
+                response=OpenApiTypes.OBJECT,
                 examples=[
                     OpenApiExample(
                         'Users Not Found',
@@ -138,14 +149,14 @@ class UserListView(APIView):
         current_user = request.user
         search_term = request.query_params.get('search', None)
         if search_term:
-            users = CustomUser.objects.select_related('userprofile', 'userstatus').filter(username__icontains=search_term, is_superuser=False).exclude(username=current_user.username)
+            users = CustomUser.objects.select_related('profile', 'user_status').filter(username__icontains=search_term, is_superuser=False).exclude(username=current_user.username)
             if not users.exists():
                 return Response(
                     {"detail": "Users not found."},
                     status=status.HTTP_404_NOT_FOUND
                 )
         else:
-            users = CustomUser.objects.select_related('userprofile', 'userstatus').filter(is_superuser=False).exclude(username=current_user.username)
+            users = CustomUser.objects.select_related('profile', 'user_status').filter(is_superuser=False).exclude(username=current_user.username)
             if not users.exists():
                 return Response(
                     {"detail": "Users not found."},
@@ -170,11 +181,19 @@ class UserDetailsView(APIView):
                 examples=[
                     OpenApiExample(
                         'Example Response',
-                        value={
-                            "id": 1,
-                            "username": "johndoe",
-                            "email": "johndoe@example.com",
-                        },
+                        value=    {
+                            "id": "6cc5f",
+                            "username": "username",
+                            "email": "useremail@gmail.com",
+                            "profile": {
+                            "profile_pic": "/media/profile_pics/house.jpeg",
+                            "bio": "user bio"
+                            },
+                            "user_status": {
+                            "status": "offline",
+                            "last_seen": "2024-08-07T07:38:27.717376Z"
+                            }
+    },
                         media_type='application/json'
                     )
                 ]

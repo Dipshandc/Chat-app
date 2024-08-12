@@ -31,8 +31,8 @@ class UserStatusSerializer(ModelSerializer):
         fields = ['status', 'last_seen']
 
 class UserSerializer(ModelSerializer):
-    profile = UserProfileSerializer(read_only=True)
-    user_status = UserStatusSerializer(read_only=True)
+    profile = UserProfileSerializer(read_only=True,allow_null=True)
+    user_status = UserStatusSerializer(read_only=True,allow_null=True)
     class Meta:
         model = CustomUser
-        fields = ['id','username', 'email','profile','user_status']
+        fields = ['id','username','email','profile','user_status']
