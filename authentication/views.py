@@ -100,6 +100,6 @@ class LoggedInUserDetailsView(APIView):
         },
     )
     def get(self, request):
-        user = request.user
+        user = CustomUser.objects.select_related('profile', 'user_status').get(id=request.user.id)
         serializer = LoggedInUserDetailsSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
