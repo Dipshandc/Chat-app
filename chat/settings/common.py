@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from datetime import timedelta
-import dj_database_url
 import os
 from pathlib import Path
 from environs import Env
@@ -21,44 +20,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 env = Env()
 env.read_env(os.path.join(BASE_DIR,'.env'))
 
-DATABASES = {
-  "default":dj_database_url.config()
-}
-
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [env("REDIS_URL")]
-        },
-    },
-}
-    
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': env('CLOUD_NAME'),
-    'API_KEY': env('API_KEY'),
-    'API_SECRET': env('API_SECRET'),
-}
-
-# Configure Django to use Cloudinary for media files
-STORAGES = {
-    "default": {
-        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-    },
-}
-
-CLOUDINARY = {
-    'secure': True,
-}
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-SECRET_KEY = env('SECRET_KEY')
 
 # Application definition
 
@@ -152,14 +118,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-STORAGES = {
-    "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-    },
-    'staticfiles': {
-        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
-    }
-}
+
 
 # sample media file config
 MEDIA_URL = '/media/'
