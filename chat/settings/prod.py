@@ -6,10 +6,6 @@ from cloudinary.utils import cloudinary_url
 
 DEBUG = False
 
-# SECRET_KEY = env('SECRET_KEY')
-
-SECRET_KEY = '&&8%1hi6jyvsqbs9=6wet*-o5=_&yy(8wa#k86dh$3qk!qf1=t'
-
 ALLOWED_HOSTS =  env('ALLOWED_HOSTS', '').split(',')
 
 DATABASES = {
