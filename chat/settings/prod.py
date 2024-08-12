@@ -27,6 +27,7 @@ EMAIL = env('DJANGO_SUPERUSER_EMAIL')
 PASSWORD = env('DJANGO_SUPERUSER_PASSWORD')
     
 if USERNAME and EMAIL and PASSWORD:
+    django.setup() 
     from authentication.models import CustomUser
     if not CustomUser.objects.filter(username=USERNAME).exists():
         CustomUser.objects.create_superuser(USERNAME, EMAIL, PASSWORD)
