@@ -1,5 +1,8 @@
+import django
 from .common import *
 import dj_database_url
+django.setup() 
+
 DEBUG = False
 
 SECRET_KEY = env('SECRET_KEY')
