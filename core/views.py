@@ -11,7 +11,7 @@ from .serializers import MessageSerializer, UserSerializer, UserProfileSerialize
 from .permissions import ChatHistoryOfUser
 
 class MessagePagination(PageNumberPagination):
-    page_size = 2
+    page_size = 20
 
 class ChatHistoryView(APIView):
     serializer_class = MessageSerializer
