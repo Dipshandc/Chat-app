@@ -27,9 +27,9 @@ EMAIL = env('DJANGO_SUPERUSER_EMAIL')
 PASSWORD = env('DJANGO_SUPERUSER_PASSWORD')
     
 if USERNAME and EMAIL and PASSWORD:
-        
-    if not AUTH_USER_MODEL.objects.filter(username=USERNAME).exists():
-        AUTH_USER_MODEL.objects.create_superuser(USERNAME, EMAIL, PASSWORD)
+    from authentication.models import CustomUser
+    if not CustomUser.objects.filter(username=USERNAME).exists():
+        CustomUser.objects.create_superuser(USERNAME, EMAIL, PASSWORD)
         print('Superuser created successfully.')
     else:
         print('Superuser already exists.')
