@@ -18,3 +18,16 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+USERNAME = env('DJANGO_SUPERUSER_USERNAME')
+EMAIL = env('DJANGO_SUPERUSER_EMAIL')
+PASSWORD = env('DJANGO_SUPERUSER_PASSWORD')
+    
+if USERNAME and EMAIL and PASSWORD:
+    from django.contrib.auth.models import User
+        
+    if not User.objects.filter(username=USERNAME).exists():
+        User.objects.create_superuser(USERNAME, EMAIL, PASSWORD)
+        print('Superuser created successfully.')
+    else:
+        print('Superuser already exists.')
