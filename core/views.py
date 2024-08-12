@@ -81,7 +81,7 @@ class ChatHistoryView(APIView):
 
 class UserListView(APIView):
     serializer_class = UserSerializer
-    permission_classes = []
+    permission_classes = [IsAuthenticated]
     filter_backends = (filters.SearchFilter,)
     search_fields = ['username']
 
