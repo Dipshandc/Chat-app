@@ -1,5 +1,5 @@
 from django.db.models.signals import post_save
-from authentication.models import CustomUser,UserProfile
+from authentication.models import CustomUser,UserProfile,UserStatus
 from django.dispatch import receiver
 from django.utils import timezone
  
@@ -7,3 +7,4 @@ from django.utils import timezone
 def create_profile(sender, instance, created, **kwargs):
     if created:
         UserProfile.objects.create(user=instance)
+        UserStatus.objects.create(user=instance,status='offline')
