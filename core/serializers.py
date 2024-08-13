@@ -1,24 +1,6 @@
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, Serializer
 from .models import ChatHistory, Message
 from authentication.models import CustomUser, UserProfile, UserStatus
-
-class ChatHistorySerializer(ModelSerializer):
-  class Meta:
-    model = ChatHistory
-    fields = ['name','users']
-
-class MessageSerializer(ModelSerializer):
-  class Meta:
-    model = Message
-    fields = ['id',
-              'user',
-              'chat_history',
-              'message',
-              'media',
-              'reply_of',
-              'sent_timestamp',
-              'deliverd_timestamp',
-              'seen_timestamp']
 
 class UserProfileSerializer(ModelSerializer):
     class Meta:
@@ -36,3 +18,17 @@ class UserSerializer(ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['id','username','email','profile','user_status']
+
+
+class MessageSerializer(ModelSerializer):
+  class Meta:
+    model = Message
+    fields = ['id',
+              'user',
+              'chat_history',
+              'message',
+              'media',
+              'reply_of',
+              'sent_timestamp',
+              'deliverd_timestamp',
+              'seen_timestamp']

@@ -6,6 +6,7 @@ from rest_framework.pagination import PageNumberPagination
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiResponse, OpenApiExample, OpenApiTypes
 from authentication.models import CustomUser, UserProfile
 from django.shortcuts import get_object_or_404
+from django.db.models import OuterRef, Subquery
 from .models import ChatHistory, Message
 from .serializers import MessageSerializer, UserSerializer, UserProfileSerializer
 from .permissions import ChatHistoryOfUser
@@ -228,14 +229,55 @@ class UserProfileView(APIView):
      permission_classes = [IsAuthenticated]
      
      def get(self,request):
-          profile = get_object_or_404(UserProfile,user=request.user).select_related('profile', 'user_status')
+          profile = get_object_or_404(UserProfile,user=request.user)
           serializer = self.serializer_class(profile)
           return Response(serializer.data,status=status.HTTP_200_OK)
      
      def patch(self,request):
           profile = get_object_or_404(UserProfile,user=request.user)
-          print(request.data)
           serializer = self.serializer_class(profile,data=request.data,partial=True)
           if serializer.is_valid(raise_exception=True):
            serializer.save()
-           return Response({"message": f"Profile's {', '.join(request.data.keys())} edited successfully"})
+           return Response({"message": f"Profile pic of {request.user.username} edited successfully"})
+          
+class ChatHistoryListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        
+        # Subquery to get the latest message timestamp for each chat history
+        latest_message_subquery = Message.objects.filter(
+            chat_history=OuterRef('pk')
+        ).order_by('-sent_timestamp').values('sent_timestamp')[:1]
+
+        # Retrieve chat histories with the latest message timestamp
+        chat_histories = ChatHistory.objects.filter(users=user).annotate(
+            latest_message_timestamp=Subquery(latest_message_subquery)
+        ).order_by('-latest_message_timestamp')
+
+        results = []
+        for chat_history in chat_histories:
+            # Get the other user in the chat
+            other_user = chat_history.users.exclude(id=user.id).first()
+
+            # Get messages for the current chat history
+            messages = Message.objects.filter(chat_history=chat_history).order_by('-sent_timestamp')
+            paginator = MessagePagination()
+            paginated_messages = paginator.paginate_queryset(messages, request)
+
+            # Serialize messages and other user
+            messages_serializer = MessageSerializer(paginated_messages, many=True)
+            other_user_serializer = UserSerializer(other_user)
+
+            # Append data to results
+            results.append({
+                "chat_history": chat_history.name,
+                "user": other_user_serializer.data,
+                "messages": messages_serializer.data
+            })
+
+        # Paginate the overall response
+        paginator = MessagePagination()
+        paginated_results = paginator.paginate_queryset(results, request)
+        return paginator.get_paginated_response(paginated_results)
