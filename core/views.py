@@ -267,7 +267,7 @@ class ChatHistoryListView(APIView):
 
             # Get messages for the current chat history
             messages = Message.objects.filter(chat_history=chat_history).order_by('-sent_timestamp')
-            paginator = MessagePagination()
+            paginator = InitialMessagePagination()
             paginated_messages = paginator.paginate_queryset(messages, request)
 
             # Serialize messages and other user
@@ -282,6 +282,6 @@ class ChatHistoryListView(APIView):
             })
 
         # Paginate the overall response
-        paginator = InitialMessagePagination()
+        paginator = MessagePagination()
         paginated_results = paginator.paginate_queryset(results, request)
         return paginator.get_paginated_response(paginated_results)
