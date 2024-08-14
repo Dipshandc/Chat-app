@@ -14,6 +14,10 @@ from .permissions import ChatHistoryOfUser
 class MessagePagination(PageNumberPagination):
     page_size = 20
 
+class InitialMessagePagination(PageNumberPagination):
+    page_size = 4
+
+
 class ChatHistoryView(APIView):
     serializer_class = MessageSerializer
     permission_classes = [IsAuthenticated,ChatHistoryOfUser]
@@ -278,6 +282,6 @@ class ChatHistoryListView(APIView):
             })
 
         # Paginate the overall response
-        paginator = MessagePagination()
+        paginator = InitialMessagePagination()
         paginated_results = paginator.paginate_queryset(results, request)
         return paginator.get_paginated_response(paginated_results)

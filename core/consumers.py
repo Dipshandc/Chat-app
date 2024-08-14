@@ -1,6 +1,5 @@
 import json
 from datetime import datetime
-
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 import django
@@ -109,17 +108,41 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         
         elif received_data_type == 'updated_message_info':
             message_id = text_data_json['message_id']
-            sender_user_id = text_data_json['user_id']
             receiver_user_id = text_data_json['receiver_id']
+            receiver = await self.get_user(receiver_user_id)
             updated_message_info_type = text_data_json['updated_message_info_type']
             if updated_message_info_type == 'seen':
-                await self.update_message_seen_status(message_id, sender_user_id, receiver_user_id)
+                message_obj =  await self.update_message_seen_status(message_id)
+                serialize_message = await self.serialize_message(message_obj)
+                message_data = serialize_message.data
+
+                await self.channel_layer.group_send(
+                    f'{receiver.username}_inbox',
+                    {
+                        'type': 'chat_message_info',
+                        'message': message_data,
+                    }
+                )
             else:
-                await self.update_message_delivered_status(message_id, sender_user_id, receiver_user_id)
+                message_obj =  await self.update_message_delivered_status(message_id)
+                serialize_message = await self.serialize_message(message_obj)
+                message_data = serialize_message.data
+
+                await self.channel_layer.group_send(
+                    f'{receiver.username}_inbox',
+                    {
+                        'type': 'chat_message_info',
+                        'message': message_data,
+                    }
+                )
 
 
     async def chat_message(self, event):
         print("Chat message....")
+        await self.send(text_data=json.dumps(event))
+
+    async def chat_message_info(self, event):
+        print("Chat message info changed....")
         await self.send(text_data=json.dumps(event))
 
     @database_sync_to_async
@@ -158,10 +181,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def update_message_seen_status(self, message_id):
         message =  Message.objects.get(id=message_id)
         message.seen_timestamp = datetime.now()
-        message.save()
+        return message.save()
 
     @database_sync_to_async
     def update_message_delivered_status(self, message_id):
         message =  Message.objects.get(id=message_id)
         message.deliverd_timestamp = datetime.now()
-        message.save()
+        return message.save()
