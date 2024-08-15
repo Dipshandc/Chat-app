@@ -174,6 +174,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def chat_message_info(self, event):
         print("Chat message info changed....")
         await self.send(text_data=json.dumps(event))
+    
+    async def user_status_update(self, event):
+        print("User status updatedd....")
+        await self.send(text_data=json.dumps(event))
 
     @database_sync_to_async
     def get_user(self, user_id):
