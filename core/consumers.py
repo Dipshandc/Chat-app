@@ -1,10 +1,10 @@
 import json
-from datetime import datetime
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 import django
 django.setup() 
 from authentication.models import CustomUser, UserStatus
+from django.utils import timezone
 from .models import ChatHistory, Message
 from .serializers import MessageSerializer, UserStatusSerializer
 
@@ -209,20 +209,20 @@ class ChatConsumer(AsyncWebsocketConsumer):
         user_status = UserStatus.objects.get(
             user_id=user_id)
         user_status.status = status
-        user_status.last_seen=datetime.now()
+        user_status.last_seen=timezone.now()
         user_status.save()
         return user_status
     
     @database_sync_to_async
     def update_message_seen_status(self, message_id):
         message =  Message.objects.get(id=message_id)
-        message.seen_timestamp = datetime.now()
+        message.seen_timestamp = timezone.now()
         return message.save()
 
     @database_sync_to_async
     def update_message_delivered_status(self, message_id):
         message =  Message.objects.get(id=message_id)
-        message.delivered_timestamp = datetime.now()
+        message.delivered_timestamp = timezone.now()
         return message.save()
     
     @database_sync_to_async
