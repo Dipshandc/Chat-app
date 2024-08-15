@@ -43,7 +43,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         f'{user}_inbox',
                         {
                             'type': 'user_status_update',
-                            'message': serialized_status.data,
+                            'status_update': serialized_status.data,
                         }
                     )
             else:
@@ -69,7 +69,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                      f'{user}_inbox',
                         {
                             'type': 'user_status_update',
-                            'message': serialized_status.data,
+                            'status_update': serialized_status.data,
                         }
                     )
                 del self.online_count[self.user.id]
@@ -232,7 +232,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def get_user_list(self,user):
         user_list = []
-        users = CustomUser.objects.exclude(id=user.id).exclude(is_superuser=True)
-        for user in users:
-            user_list.append(user.username)
+        online_users_status = UserStatus.objects.filter(status="online")
+        for user in online_users_status:
+            online_user = CustomUser.objects.get(id=user.user)
+            user_list.append(online_user.username)
         return user_list
