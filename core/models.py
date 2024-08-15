@@ -26,7 +26,7 @@ class Message(models.Model):
     media = models.FileField(upload_to=dynamic_media_path)
     reply_of = models.ForeignKey('self', on_delete=models.SET_DEFAULT, null=True, blank=True, default=None, related_name='replies')
     sent_timestamp = models.DateTimeField(auto_now_add=True)
-    delivered_timestamp = models.DateTimeField(blank=True,null=True)
+    deliverd_timestamp = models.DateTimeField(blank=True,null=True)
     seen_timestamp = models.DateTimeField(blank=True,null=True)
 
 

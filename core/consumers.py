@@ -226,7 +226,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def update_message_delivered_status(self, message_id):
         message =  Message.objects.get(id=message_id)
-        message.delivered_timestamp = timezone.now()
+        message.deliverd_timestamp = timezone.now()
         return message.save()
     
     @database_sync_to_async

@@ -30,5 +30,5 @@ class MessageSerializer(ModelSerializer):
               'media',
               'reply_of',
               'sent_timestamp',
-              'delivered_timestamp',
+              'deliverd_timestamp',
               'seen_timestamp']
