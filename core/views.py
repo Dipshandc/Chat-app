@@ -42,7 +42,7 @@ class ChatHistoryView(APIView):
                                     "media": None,
                                     "reply_of": None,
                                     "sent_timestamp": "2024-07-28T12:34:56Z",
-                                    "deliverd_timestamp": "2024-07-28T12:35:00Z",
+                                    "delivered_timestamp": "2024-07-28T12:35:00Z",
                                     "seen_timestamp": "2024-07-28T12:36:00Z"
                                 }
                             ],
