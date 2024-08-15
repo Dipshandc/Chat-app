@@ -4,7 +4,7 @@ import cloudinary.uploader
 from cloudinary.utils import cloudinary_url
 import dj_database_url
 
-DEBUG = False
+DEBUG = True
 
 SECRET_KEY = env('SECRET_KEY')
 
