@@ -12,6 +12,11 @@ class UserStatusSerializer(ModelSerializer):
         model = UserStatus
         fields = ['status', 'last_seen']
 
+class UserStatusWithUserSerializer(ModelSerializer):
+    class Meta:
+        model = UserStatus
+        fields = ['user','status', 'last_seen']
+
 class UserSerializer(ModelSerializer):
     profile = UserProfileSerializer(read_only=True,allow_null=True)
     user_status = UserStatusSerializer(read_only=True,allow_null=True)

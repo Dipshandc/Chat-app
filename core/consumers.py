@@ -6,7 +6,7 @@ django.setup()
 from authentication.models import CustomUser, UserStatus
 from django.utils import timezone
 from .models import ChatHistory, Message
-from .serializers import MessageSerializer, UserStatusSerializer
+from .serializers import MessageSerializer, UserStatusWithUserSerializer
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -18,10 +18,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     
     async def connect(self):
-        print('Websocket Connected...')
         self.user = self.scope['user']
         if self.user.is_authenticated:
             await self.accept()
+            print('Websocket Connected...')
 
             await self.channel_layer.group_add(
                 f'{self.user.username}_inbox',
@@ -38,14 +38,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 else:
                     self.online_count[self.user.id] = 1
                 users = await self.get_user_list(self.user)
-                for user in users:
-                    await self.channel_layer.group_send(
-                        f'{user}_inbox',
-                        {
-                            'type': 'user_status_update',
-                            'status_update': serialized_status.data,
-                        }
-                    )
+                if users:
+                    for user in users:
+                        await self.channel_layer.group_send(
+                            f'{user}_inbox',
+                            {
+                                'type': 'user_status_update',
+                                'data': serialized_status.data,
+                            }
+                        )
             else:
                 print('Error updating user status')
                 
@@ -53,26 +54,27 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.close()
 
     async def disconnect(self, close_code):
-        print(f'Websocket Disconnected with code: {close_code}')
         await self.channel_layer.group_discard(
             f'{self.user.username}_inbox',
             self.channel_name,
         )
+        print(f'Websocket Disconnected with code: {close_code}')
         if self.user.id in self.online_count:
             self.online_count[self.user.id] -= 1
             if self.online_count[self.user.id] == 0:
                 status_obj = await self.update_user_status(self.user.id, 'offline')
                 serialized_status = await self.serialize_status(status_obj)
                 users = await self.get_user_list(self.user)
-                for user in users:
-                 await self.channel_layer.group_send(
-                     f'{user}_inbox',
-                        {
-                            'type': 'user_status_update',
-                            'status_update': serialized_status.data,
-                        }
-                    )
-                del self.online_count[self.user.id]
+                if users:
+                    for user in users:
+                        await self.channel_layer.group_send(
+                            f'{user}_inbox',
+                            {
+                                'type': 'user_status_update',
+                                'data': serialized_status.data,
+                            }
+                        )
+                    del self.online_count[self.user.id]
                 
 
     async def receive(self, text_data=None, bytes_data=None):
@@ -176,7 +178,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps(event))
     
     async def user_status_update(self, event):
-        print("User status updatedd....")
         await self.send(text_data=json.dumps(event))
 
     @database_sync_to_async
@@ -202,7 +203,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     
     @database_sync_to_async
     def serialize_status(self,status_obj):
-        return UserStatusSerializer(status_obj)
+        return UserStatusWithUserSerializer(status_obj)
 
     @database_sync_to_async
     def get_chat_history(self, group_id):
@@ -232,8 +233,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def get_user_list(self,user):
         user_list = []
-        online_users_status = UserStatus.objects.filter(status="online")
-        for user in online_users_status:
-            online_user = CustomUser.objects.get(id=user.user)
-            user_list.append(online_user.username)
-        return user_list
+        online_users_status = UserStatus.objects.filter(status="online").exclude(user=self.user)
+        if online_users_status:
+            for user in online_users_status:
+                online_user = CustomUser.objects.get(id=user.user.id)
+                user_list.append(online_user.username)
+            return user_list
+        else:
+            return False
