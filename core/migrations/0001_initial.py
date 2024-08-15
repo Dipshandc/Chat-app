@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
                 ('message', models.CharField(max_length=512)),
                 ('media', models.FileField(upload_to=core.models.dynamic_media_path)),
                 ('sent_timestamp', models.DateTimeField(auto_now_add=True)),
-                ('deliverd_timestamp', models.DateTimeField(blank=True, null=True)),
+                ('delivered_timestamp', models.DateTimeField(blank=True, null=True)),
                 ('seen_timestamp', models.DateTimeField(blank=True, null=True)),
                 ('chat_history', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.chathistory')),
                 ('reply_of', models.ForeignKey(blank=True, default=None, null=True, on_delete=django.db.models.deletion.SET_DEFAULT, related_name='replies', to='core.message')),

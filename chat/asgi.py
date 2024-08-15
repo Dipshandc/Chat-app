@@ -15,7 +15,7 @@ from django.core.asgi import get_asgi_application
 from core.routing import websocket_urlpatterns
 from chat.settings.common import env
 
-env('DJANGO_SETTINGS_MODULE')
+env('DJANGO_SETTINGS_MODULE','chat.settings.dev')
 django.setup() 
 django_asgi_app = get_asgi_application()
 
