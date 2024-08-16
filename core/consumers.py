@@ -152,7 +152,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     f'{receiver.username}_inbox',
                     {
                         'type': 'chat_message_info',
-                        'message': message_data,
+                        'data': message_data,
                     }
                 )
             else:
@@ -164,7 +164,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     f'{receiver.username}_inbox',
                     {
                         'type': 'chat_message_info',
-                        'message': message_data,
+                        'data': message_data,
                     }
                 )
 
