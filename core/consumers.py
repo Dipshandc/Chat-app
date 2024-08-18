@@ -167,7 +167,19 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         'data': message_data,
                     }
                 )
-
+        elif received_data_type == 'call':
+            receiver_user_id = text_data_json['receiver_id']
+            receiver = await self.get_user(receiver_user_id)
+            await self.channel_layer.group_send(
+                f'{receiver.username}_inbox',
+                {
+                    'type': 'call_received',
+                    'data':  {
+                        'caller': self.user,
+                        'rtcMessage': text_data_json['data']['rtcMessage']
+                        }
+                }
+                )
 
     async def chat_message(self, event):
         print("Chat message....")
