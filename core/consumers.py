@@ -173,13 +173,49 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.channel_layer.group_send(
                 f'{receiver.username}_inbox',
                 {
-                    'type': 'call_received',
+                    'type': 'call_request',
                     'data':  {
-                        'caller': self.user,
-                        'rtcMessage': text_data_json['data']['rtcMessage']
+                        'caller': self.user.id,
+                        'rtcMessage': text_data_json['rtcMessage']
                         }
                 }
                 )
+            
+        elif received_data_type == 'call_answered':
+            caller_user_id = text_data_json['caller_id']
+            caller = await self.get_user(caller_user_id)
+            await self.channel_layer.group_send(
+                f'{caller.username}_inbox',
+                {
+                    'type': 'call_answered',
+                    'data':  {
+                        'rtcMessage': text_data_json['rtcMessage']
+                        }
+                }
+                )
+    
+        elif received_data_type == 'ICEcandidate':
+            user_id = text_data_json['user']
+            user = await self.get_user(user_id)
+            await self.channel_layer.group_send(
+                f'{user.username}_inbox',
+                {
+                    'type': 'ICEcandidate',
+                    'data':  {
+                        'rtcMessage': text_data_json['rtcMessage']
+                        }
+                }
+                )
+    async def call_request(self, event):
+          print(f"{self.user.username} is calling....")
+          await self.send(text_data=json.dumps(event))
+
+    async def call_answered(self, event):
+          print(f"{self.user.username} answered the call")
+          await self.send(text_data=json.dumps(event))
+
+    async def ICEcandidate(self, event):
+          await self.send(text_data=json.dumps(event))
 
     async def chat_message(self, event):
         print("Chat message....")
