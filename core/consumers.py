@@ -38,7 +38,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 else:
                     self.online_count[self.user.id] = 1
                 users = await self.get_user_list(self.user)
-                if users:
+                if users and self.online_count[self.user.id] == 1:
                     for user in users:
                         await self.channel_layer.group_send(
                             f'{user}_inbox',
@@ -206,6 +206,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         }
                 }
                 )
+            
     async def call_request(self, event):
           print(f"{self.user.username} is calling....")
           await self.send(text_data=json.dumps(event))
