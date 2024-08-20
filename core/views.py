@@ -229,20 +229,40 @@ class UserDetailsView(APIView):
 
 
 class UserProfileView(APIView):
-     serializer_class = UserProfileSerializer
-     permission_classes = [IsAuthenticated]
-     
-     def get(self,request):
-          profile = get_object_or_404(UserProfile,user=request.user)
-          serializer = self.serializer_class(profile)
-          return Response(serializer.data,status=status.HTTP_200_OK)
-     
-     def patch(self,request):
-          profile = get_object_or_404(UserProfile,user=request.user)
-          serializer = self.serializer_class(profile,data=request.data,partial=True)
-          if serializer.is_valid(raise_exception=True):
-           serializer.save()
-           return Response({"message": f"Profile pic of {request.user.username} edited successfully"})
+    serializer_class = UserProfileSerializer
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        summary="Retrieve User Profile",
+        responses={
+            200: UserProfileSerializer,
+            404: OpenApiResponse(description="Profile not found"),
+        },
+        description="Fetches the profile information of the authenticated user."
+    )
+    def get(self, request):
+        profile = get_object_or_404(UserProfile, user=request.user)
+        serializer = self.serializer_class(profile)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        summary="Update User Profile",
+        request=UserProfileSerializer,
+        responses={
+            200: OpenApiResponse(description="Profile updated successfully"),
+            400: OpenApiResponse(description="Invalid data"),
+        },
+        description="Allows the authenticated user to partially update their profile information."
+    )
+    def patch(self, request):
+        profile = get_object_or_404(UserProfile, user=request.user)
+        serializer = self.serializer_class(profile, data=request.data, partial=True)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(
+                {"message": f"Profile pic of {request.user.username} edited successfully"},
+                status=status.HTTP_200_OK
+            )
           
 class ChatHistoryListView(APIView):
     permission_classes = [IsAuthenticated]
