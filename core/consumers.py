@@ -54,10 +54,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.close()
 
     async def disconnect(self, close_code):
-        await self.channel_layer.group_discard(
-            f'{self.user.username}_inbox',
-            self.channel_name,
-        )
         print(f'Websocket Disconnected with code: {close_code}')
         if self.user.id in self.online_count:
             self.online_count[self.user.id] -= 1
@@ -76,6 +72,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         )
                     del self.online_count[self.user.id]
                 
+        await self.channel_layer.group_discard(
+            f'{self.user.username}_inbox',
+            self.channel_name,
+        )
 
     async def receive(self, text_data=None, bytes_data=None):
         print('Message received from client')
