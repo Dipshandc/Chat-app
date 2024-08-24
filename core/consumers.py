@@ -167,6 +167,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         'data': message_data,
                     }
                 )
+                
         elif received_data_type == 'call':
             receiver_user_id = text_data_json['receiver_id']
             receiver = await self.get_user(receiver_user_id)
