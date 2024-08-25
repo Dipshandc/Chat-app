@@ -146,25 +146,23 @@ class ChatConsumer(AsyncWebsocketConsumer):
             if updated_message_info_type == 'seen':
                 message_obj =  await self.update_message_seen_status(message_id)
                 serialize_message = await self.serialize_message(message_obj)
-                message_data = serialize_message.data
 
                 await self.channel_layer.group_send(
                     f'{receiver.username}_inbox',
                     {
                         'type': 'chat_message_info',
-                        'data': message_data,
+                        'data': serialize_message.data,
                     }
                 )
-            else:
+            elif updated_message_info_type == 'delivered':
                 message_obj =  await self.update_message_delivered_status(message_id)
                 serialize_message = await self.serialize_message(message_obj)
-                message_data = serialize_message.data
 
                 await self.channel_layer.group_send(
                     f'{receiver.username}_inbox',
                     {
                         'type': 'chat_message_info',
-                        'data': message_data,
+                        'data': serialize_message.data,
                     }
                 )
                 
