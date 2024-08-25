@@ -270,13 +270,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def update_message_seen_status(self, message_id):
         message =  Message.objects.get(id=message_id)
         message.seen_timestamp = timezone.now()
-        return message.save()
+        message.save()
+        return message
 
     @database_sync_to_async
     def update_message_delivered_status(self, message_id):
         message =  Message.objects.get(id=message_id)
         message.delivered_timestamp = timezone.now()
-        return message.save()
+        message.save()
+        return message
     
     @database_sync_to_async
     def get_user_list(self,user):
