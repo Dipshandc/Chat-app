@@ -7,6 +7,7 @@ def dynamic_media_path(instance, filename):
     chat_history_slug = slugify(str(instance)) 
     return f'media/chat_history/{chat_history_slug}/{filename}'
 
+
 class ChatHistory(models.Model):
     name = models.CharField(max_length=255,primary_key=True)
     users = models.ManyToManyField(CustomUser)
@@ -18,7 +19,6 @@ class ChatHistory(models.Model):
         return f"Chat between {self.get_users()}"
 
 
-
 class Message(models.Model):
     user = models.ForeignKey(to=CustomUser, on_delete=models.CASCADE)
     chat_history = models.ForeignKey(to=ChatHistory, on_delete=models.CASCADE)
@@ -28,7 +28,6 @@ class Message(models.Model):
     sent_timestamp = models.DateTimeField(auto_now_add=True)
     delivered_timestamp = models.DateTimeField(blank=True,null=True)
     seen_timestamp = models.DateTimeField(blank=True,null=True)
-
 
     def __str__(self):
         return f'{self.user.username}: {self.message} [{self.sent_timestamp}]'
