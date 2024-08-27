@@ -31,3 +31,20 @@ class UserProfile(models.Model):
     def __str__(self):
       return f"{self.user.username}'s Profile"
   
+class Friend(models.Model):
+    PENDING = 'p'
+    ACCEPTED = 'a'
+    REJECTED = 'r'
+
+    STATUS_CHOICES = [
+       (PENDING, 'Pending'),
+       (ACCEPTED, 'Accepted'),
+       (REJECTED, 'Rejected'),
+       ]
+    
+    sender = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='sent_friend_request')
+    receiver = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='received_friend_request')
+    status = models.CharField(choices=STATUS_CHOICES, default=PENDING)
+    created_timestamp = models.DateTimeField(auto_now_add=True)
+    updated_timestamp = models.DateTimeField(auto_now=True)
+           
