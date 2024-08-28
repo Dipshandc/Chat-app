@@ -8,11 +8,11 @@ def generate_random_id():
 
 
 class CustomUser(AbstractUser):
-  id = models.CharField(primary_key=True,max_length=6,default=generate_random_id)
-  email = models.EmailField(unique=True)
+    id = models.CharField(primary_key=True,max_length=6,default=generate_random_id)
+    email = models.EmailField(unique=True)
   
-  def __str__(self):
-    return self.username
+    def __str__(self):
+      return self.username
   
 class UserStatus(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE,related_name='user_status')
@@ -31,7 +31,7 @@ class UserProfile(models.Model):
     def __str__(self):
       return f"{self.user.username}'s Profile"
   
-class Friend(models.Model):
+class FriendRequest(models.Model):
     PENDING = 'p'
     ACCEPTED = 'a'
     REJECTED = 'r'
@@ -44,7 +44,25 @@ class Friend(models.Model):
     
     sender = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='sent_friend_request')
     receiver = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='received_friend_request')
-    status = models.CharField(choices=STATUS_CHOICES, default=PENDING)
-    created_timestamp = models.DateTimeField(auto_now_add=True)
-    updated_timestamp = models.DateTimeField(auto_now=True)
+    status = models.CharField(max_length=1, choices=STATUS_CHOICES, default=PENDING)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ['sender', 'receiver']
+
+    def __str__(self):
+        return f"{self.sender} to {self.receiver} - {self.get_status_display()}"
+
+
+class FriendShip(models.Model):
+    user = models.ForeignKey(CustomUser, related_name='friendships', on_delete=models.CASCADE)
+    friend = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+      unique_together = ['user', 'friend']
+
+    def __str__(self):
+      return f"{self.user} is friends with {self.friend}"
            
