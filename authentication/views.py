@@ -114,4 +114,4 @@ class FriendRequestView(APIView):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-        return Response({"message": "Request sent "}, status=status.HTTP_201_CREATED, headers=headers)
+        return Response({"message": "Friend request sent successfully."}, status=status.HTTP_201_CREATED, headers=headers)
