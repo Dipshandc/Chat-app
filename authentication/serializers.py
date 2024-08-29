@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CustomUser, UserProfile, UserStatus
+from .models import CustomUser, UserProfile, UserStatus, FriendRequest, FriendShip
 
 class UserCreateSerializer(serializers.ModelSerializer):
   id = serializers.CharField(read_only=True)
@@ -28,3 +28,13 @@ class LoggedInUserDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['id','username','email','profile','user_status']
+
+class FriendRequestSerializer(serializers.Modelserializer):
+   class Meta:
+      model =FriendRequest
+      fiels = ['sender','receiver','status','created_at','updated_at']
+
+class FriendShipSerializer(serializers.Modelserializer):
+   class Meta:
+      model = FriendShip
+      fields = ['user','friend','created_at']
