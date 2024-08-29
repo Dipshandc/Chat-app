@@ -5,7 +5,7 @@ from rest_framework import status
 from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiResponse
 from drf_spectacular.types import OpenApiTypes
 from .models import CustomUser
-from .serializers import UserCreateSerializer, LoggedInUserDetailsSerializer
+from .serializers import UserCreateSerializer, LoggedInUserDetailsSerializer, FriendRequestSerializer
 
 class UserViewSet(APIView):
     serializer_class = UserCreateSerializer
@@ -103,3 +103,15 @@ class LoggedInUserDetailsView(APIView):
         user = CustomUser.objects.select_related('profile', 'user_status').get(id=request.user.id)
         serializer = LoggedInUserDetailsSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+class FriendRequestView(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = FriendRequestSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response({"message": "Friend request sent successfully."}, status=status.HTTP_201_CREATED, headers=headers)
