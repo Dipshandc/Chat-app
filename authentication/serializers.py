@@ -29,10 +29,10 @@ class LoggedInUserDetailsSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = ['id','username','email','profile','user_status']
 
-class FriendRequestSerializer(serializers.Modelserializer):
+class FriendRequestSerializer(serializers.ModelSerializer):
    class Meta:
-      model =FriendRequest
-      fiels = ['sender','receiver','status','created_at','updated_at']
+      model = FriendRequest
+      fields = ['sender','receiver','status','created_at','updated_at']
 
 class FriendShipSerializer(serializers.Modelserializer):
    class Meta:
