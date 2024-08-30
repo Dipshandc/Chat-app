@@ -9,8 +9,6 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
   def create(self, validated_data):
     return CustomUser.objects.create_user(**validated_data)
-  
-
 
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
@@ -31,10 +29,10 @@ class LoggedInUserDetailsSerializer(serializers.ModelSerializer):
 
 class FriendRequestSerializer(serializers.ModelSerializer):
    class Meta:
-      model = FriendRequest
+      model =FriendRequest
       fields = ['sender','receiver','status','created_at','updated_at']
 
-class FriendShipSerializer(serializers.Modelserializer):
+class FriendShipSerializer(serializers.ModelSerializer):
    class Meta:
       model = FriendShip
       fields = ['user','friend','created_at']
