@@ -32,3 +32,55 @@ project-root/
 │
 ├── requirements.txt            # Project dependencies
 └── README.md                   # Project documentation
+```
+## Getting Started
+### Prerequisites
+- ** Python 3.x
+- ** Django and Django Channels
+- ** Redis (as a message broker for handling real-time data flow)
+### Installation
+Clone the Repository:
+
+bash
+Copy code
+git clone https://github.com/your-username/real-time-chat-app.git
+cd real-time-chat-app
+Install Dependencies:
+
+bash
+Copy code
+pip install -r requirements.txt
+Configure Redis:
+
+Ensure Redis is installed and running on the default port (6379). Adjust settings in settings.py if necessary.
+
+Apply Migrations:
+
+bash
+Copy code
+python manage.py migrate
+Run the Server:
+
+Start the Django server and Redis:
+
+bash
+Copy code
+python manage.py runserver
+Running the Chat Application
+Once the server is running, access the app at http://localhost:8000. Users can register, log in, and start real-time messaging with others.
+
+Usage
+User Registration: New users can sign up and set up their profiles.
+User Login: Authenticate using JWT tokens for secure communication.
+Real-Time Chat: Send and receive messages instantly, with live updates.
+Online/Offline Status: View active users in real time.
+Technology Stack
+Backend: Django, Django Channels
+Authentication: JSON Web Tokens (JWT)
+Real-Time Communication: WebSocket, Redis
+Database: SQLite (or any preferred database)
+Future Enhancements
+Media Sharing: Allow users to share images or files within the chat.
+Typing Indicators: Show when other users are typing in real-time.
+Message Reactions: Add emoji-based reactions to messages.
+Video and Audio Calls: Integrate WebRTC for real-time audio and video communication.
