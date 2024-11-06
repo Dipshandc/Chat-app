@@ -39,23 +39,23 @@ project-root/
 - Django and Django Channels
 - Redis (as a message broker for handling real-time data flow)
 ### Installation
-1 Clone the Repository:
+1. Clone the Repository:
 ```code
 git clone https://github.com/your-username/real-time-chat-app.git
 cd real-time-chat-app
 ```
-2 Install Dependencies:
+2. Install Dependencies:
 ```code
 pip install -r requirements.txt
 ```
-3 Configure Redis:
+3. Configure Redis:
  Ensure Redis is installed and running on the default port (6379). Adjust settings in settings.py if necessary.
 
-4 Apply Migrations:
+4. Apply Migrations:
 ```code
 python manage.py migrate
 ```
-5 Run the Server:
+5. Run the Server:
  Start the Django server and Redis:
  
 ```code
@@ -65,10 +65,10 @@ python manage.py runserver
 Once the server is running, access the app at http://localhost:8000. Users can register, log in, and start real-time messaging with others.
 
 ### Usage
-1 User Registration: New users can sign up and set up their profiles.
-2 User Login: Authenticate using JWT tokens for secure communication.
-3 Real-Time Chat: Send and receive messages instantly, with live updates.
-4 Online/Offline Status: View active users in real time.
+1. User Registration: New users can sign up and set up their profiles.
+2. User Login: Authenticate using JWT tokens for secure communication.
+3. Real-Time Chat: Send and receive messages instantly, with live updates.
+4. Online/Offline Status: View active users in real time.
 
 ### Technology Stack
 - Backend: Django, Django Channels
